@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import copyIcon from "./images/copy-icon.svg";
+import "./App.css";
 
 interface IFormInputs {
   characterLength: number;
@@ -10,13 +11,28 @@ interface IFormInputs {
   includeSymbols: boolean;
 }
 
-enum PasswordStrength {
-  Weak,
-  Fair,
-  Medium,
-  Strong,
-  VeryStrong,
-}
+const passwordStrengths: { [key: string]: { text: string; color: string } } = {
+  "0": {
+    text: "Weak",
+    color: "bg-red-500",
+  },
+  "1": {
+    text: "Weak",
+    color: "bg-red-500",
+  },
+  "2": {
+    text: "Fair",
+    color: "bg-orange-500",
+  },
+  "3": {
+    text: "Medium",
+    color: "bg-soft-yellow",
+  },
+  "4": {
+    text: "Strong",
+    color: "bg-green-500",
+  },
+};
 
 const copyToClipboard = (text: string) => {
   const textarea = document.createElement("textarea");
@@ -106,27 +122,36 @@ function App() {
   };
 
   return (
-    <div className="App flex h-screen flex-col items-center justify-center">
-      <h1>Password Generator</h1>
+    <div className="App m-auto flex max-w-2xl flex-col items-center space-y-8 px-8 pt-24">
+      <h1 className="text-2xl text-medium-gray">Password Generator</h1>
 
-      <div>
-        <input type="text" value={password} readOnly />
+      <div className="w-full bg-dark-gray-blue p-8">
+        <input
+          type="text"
+          className="w-2/3 overflow-x-scroll bg-transparent text-3xl text-off-white"
+          value={password}
+          readOnly
+        />
         <img
           src={copyIcon}
-          className="inline w-6 cursor-pointer"
+          className="float-right inline w-8 cursor-pointer hover:opacity-25"
           alt="Copy"
           onClick={() => copyToClipboard(password)}
         />
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <label>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full bg-dark-gray-blue p-8"
+      >
+        <div className="mb-12">
+          <label className="text-2xl text-off-white">
             Character Length
-            <span className="float-right">{characterLength}</span>
+            <span className="float-right text-4xl text-light-green">
+              {characterLength}
+            </span>
             <input
               {...register("characterLength")}
-              className="block w-full"
               onChange={(e) => setCharacterLength(+e.target.value)}
               type="range"
               min="1"
@@ -138,41 +163,58 @@ function App() {
         </div>
 
         <div>
-          <label>
+          <label className="custom-checkbox-contain">
             <input {...register("includeUppercaseLetters")} type="checkbox" />
-            Include Uppercase Letters
+            <span className="text-2xl tracking-wider text-off-white">
+              Include Uppercase Letters
+            </span>
+            <div className="custom-checkbox-input"></div>
           </label>
         </div>
 
         <div>
-          <label>
+          <label className="custom-checkbox-contain">
             <input {...register("includeLowercaseLetters")} type="checkbox" />
-            Include Lowercase Letters
+            <span className="text-2xl tracking-wider text-off-white">
+              Include Lowercase Letters
+            </span>
+            <div className="custom-checkbox-input"></div>
           </label>
         </div>
 
         <div>
-          <label>
+          <label className="custom-checkbox-contain">
             <input {...register("includeNumbers")} type="checkbox" />
-            Include Numbers
+            <span className="text-2xl tracking-wider text-off-white">
+              Include Numbers
+            </span>
+            <div className="custom-checkbox-input"></div>
           </label>
         </div>
 
         <div>
-          <label>
+          <label className="custom-checkbox-contain">
             <input {...register("includeSymbols")} type="checkbox" />
-            Include Symbols
+            <span className="text-2xl tracking-wider text-off-white">
+              Include Symbols
+            </span>
+            <div className="custom-checkbox-input"></div>
           </label>
         </div>
 
-        <div>
-          <span>Strength</span>
+        <div className="my-8 flex flex-row items-center justify-between bg-very-dark-blue p-8">
+          <span className="text-2xl uppercase tracking-wide text-medium-gray">
+            Strength
+          </span>
           <PasswordStrengthIndicator strength={passwordStrength} />
         </div>
 
-        <div>
-          <button type="submit">Generate Password</button>
-        </div>
+        <button
+          type="submit"
+          className="w-full border-2 border-light-green bg-light-green p-8 text-2xl uppercase tracking-wide text-dark-gray-blue hover:bg-dark-gray-blue hover:text-light-green"
+        >
+          Generate &rarr;
+        </button>
       </form>
     </div>
   );
@@ -181,16 +223,29 @@ function App() {
 const PasswordStrengthIndicator = (props: { strength: number }) => {
   const { strength } = props;
   let bars = [];
+  const text = passwordStrengths[strength]?.text;
+  const color = passwordStrengths[strength]?.color;
 
-  for (let i = 0; i < strength; i++) {
+  for (let i = 1; i <= strength; i++) {
     bars.push(
-      <div key={i} className="inline-block h-1 w-4 bg-green-500"></div>
+      <div key={i} className={`inline-block h-14 w-5 ${color} bg-b`}></div>
+    );
+  }
+
+  for (let i = strength + 1; i <= 4; i++) {
+    bars.push(
+      <div
+        key={i}
+        className="inline-block h-14 w-5 border-4 border-off-white"
+      ></div>
     );
   }
   return (
-    <div>
-      <span>{PasswordStrength[strength]}</span>
-      <div className="inline-flex space-x-1">{bars}</div>
+    <div className="flex flex-row items-center space-x-4">
+      <span className="text-2xl uppercase tracking-wide text-off-white">
+        {text}
+      </span>
+      <div className="inline-flex space-x-3">{bars}</div>
     </div>
   );
 };
